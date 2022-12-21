@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Vendor.Application.Interfaces;
+using Vendor.Application.MediatR.Articles.Commands;
 using Vendor.Application.MediatR.Articles.Queries;
 using Vendor.Application.Models.Dto;
+using Vendor.Core.Enums;
 using Vendor.Core.Exceptions;
 using ILogger = Vendor.Application.Interfaces.ILogger;
 
@@ -25,18 +27,13 @@ namespace Vendor.WebApi.Controllers
             _supplierService = supplierService;
         }
 
-        //public bool ArticleInInventory(int id)
-        //{
-        //    return _supplierService.ArticleInInventory(id);
-        //}
-
         /// <summary>
-        /// Get brand by id
+        /// Get article by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         /// 
-        [HttpGet("{id}", Name = "GetArticle")]
+        [HttpGet("GetArticle/{id}", Name = "GetArticle")]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(ArticleDto), 200)]
         public async Task<IActionResult> GetArticle([FromRoute] int id)
@@ -49,33 +46,25 @@ namespace Vendor.WebApi.Controllers
             return Ok(result.Data);
         }
 
-        //public void BuyArticle(Article article, int buyerId)
-        //{
-        //    var id = article.Id;
-        //    if (article == null)
-        //    {
-        //        throw new Exception("Could not order article");
-        //    }
+        /// <summary>
+        /// Create brand
+        /// </summary>
+        /// <param name="articleDto"></param>
+        /// <returns></returns>
+        /// 
+        [HttpPost("BuyArticle", Name = "BuyArticle")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> BuyArticle([FromBody] ArticleDto articleDto)
+        {
+            var result = await _mediator.Send(new BuyArticleCommand { Article = articleDto });
 
-        //    _logger.Debug("Trying to sell article with id=" + id);
+            if (result.IsSuccessful) return Ok(result.Data);
+            if (result.ErrorType == ErrorType.NotFound)
+                throw new NotFoundException("article", "current");
 
-        //    article.IsSold = true;
-        //    article.SoldDate = DateTime.Now;
-        //    article.BuyerUserId = buyerId;
-
-        //    try
-        //    {
-        //        _databaseDriver.Save(article);
-        //        _logger.Info("Article with id=" + id + " is sold.");
-        //    }
-        //    catch (ArgumentNullException ex)
-        //    {
-        //        _logger.Error("Could not save article with id=" + id);
-        //        throw new Exception("Could not save article with id");
-        //    }
-        //    catch (Exception)
-        //    {
-        //    }
-        //}
+            _logger.Error("Could not save article with id=" + articleDto.Id);
+            throw new ApiException(result.Message, System.Net.HttpStatusCode.InternalServerError);
+        }
     }
 }

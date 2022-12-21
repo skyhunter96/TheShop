@@ -1,4 +1,5 @@
-﻿using Vendor.Domain.Models;
+﻿using Vendor.Application.Models.Dto;
+using Vendor.Domain.Models;
 
 namespace Vendor.Application.Interfaces
 {
@@ -6,6 +7,6 @@ namespace Vendor.Application.Interfaces
     {
         public Article GetById(int id);
 
-        public void Save(Article article);
+        public void Save(ArticleDto article);
     }
 }
