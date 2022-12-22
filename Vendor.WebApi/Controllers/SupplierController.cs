@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Vendor.Application.Interfaces;
 using Vendor.Application.MediatR.Articles.Commands;
 using Vendor.Application.MediatR.Articles.Queries;
 using Vendor.Application.Models.Dto;
@@ -12,19 +11,15 @@ namespace Vendor.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SupplierController : /*BaseController*/ ControllerBase
+    public class SupplierController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IDatabaseDriver _databaseDriver;
         private readonly ILogger _logger;
-        private readonly ISupplierService _supplierService;
 
-        public SupplierController(IMediator mediator, IDatabaseDriver databaseDriver, ILogger logger, ISupplierService supplierService)
+        public SupplierController(IMediator mediator, ILogger logger)
         {
             _mediator = mediator;
-            _databaseDriver = databaseDriver;
             _logger = logger;
-            _supplierService = supplierService;
         }
 
         /// <summary>
@@ -47,7 +42,7 @@ namespace Vendor.WebApi.Controllers
         }
 
         /// <summary>
-        /// Create brand
+        /// Buy article
         /// </summary>
         /// <param name="articleDto"></param>
         /// <returns></returns>
